@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import TripOriginIcon from '@material-ui/icons/TripOrigin';
 import Link from '@material-ui/core/Link';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { HOME_PAGE } from '../containers/App/constants';
 import { userSignOut } from '../containers/Authentication/actions';
 
@@ -32,16 +32,23 @@ export default function Header(props) {
   const classes = useStyles();
   const { title } = props;
   const dispatch = useDispatch();
+  const auth = useSelector(e => e.auth);
+  console.log('Header -> auth', auth);
 
   const handleSignOut = () => dispatch(userSignOut());
 
   return (
     <React.Fragment>
       <Toolbar className={classes.toolbar}>
-        <Link to={HOME_PAGE} underline="none">
-          <TripOriginIcon fontSize="large" />
-        </Link>
-
+        <section>
+          <Link to={HOME_PAGE} underline="none">
+            <TripOriginIcon fontSize="large" />
+          </Link>
+          <Typography display="inline">
+            {' '}
+            {`Hi, ${auth.data?.firstName || ''}`}
+          </Typography>
+        </section>
         <Typography
           component="h2"
           variant="h5"
