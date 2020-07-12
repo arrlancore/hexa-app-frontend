@@ -80,10 +80,12 @@ export default function HomePage() {
     dispatch(getListCluster(auth.token));
   }, []);
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = loadList => {
     setOpenDialog(false);
     setDataEdit(undefined);
-    dispatch(getListCluster(auth.token));
+    if (loadList) {
+      dispatch(getListCluster(auth.token));
+    }
   };
 
   const handleCreate = () => {

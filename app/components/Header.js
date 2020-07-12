@@ -33,7 +33,6 @@ export default function Header(props) {
   const { title } = props;
   const dispatch = useDispatch();
   const auth = useSelector(e => e.auth);
-  console.log('Header -> auth', auth);
 
   const handleSignOut = () => dispatch(userSignOut());
 

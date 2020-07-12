@@ -44,7 +44,7 @@ export default function FormDialog({ open, handleClose, dataEdit }) {
   const prevLoading = usePrevious(cluster.loading);
   React.useEffect(() => {
     if (prevLoading && !cluster.loading) {
-      handleClose();
+      handleClose(true);
     }
   }, [cluster.loading, prevLoading]);
 
@@ -66,7 +66,7 @@ export default function FormDialog({ open, handleClose, dataEdit }) {
       <Dialog
         fullScreen
         open={open}
-        onClose={handleClose}
+        onClose={() => handleClose()}
         TransitionComponent={Transition}
       >
         <AppBar className={classes.appBar}>
@@ -74,7 +74,7 @@ export default function FormDialog({ open, handleClose, dataEdit }) {
             <IconButton
               edge="start"
               color="inherit"
-              onClick={handleClose}
+              onClick={() => handleClose()}
               aria-label="close"
             >
               <CloseIcon />
