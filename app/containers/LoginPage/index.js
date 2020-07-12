@@ -91,7 +91,7 @@ export default function LoginPage({ history }) {
   return (
     <>
       <Helmet>
-        <title>{`Signin - ${config.app.appName}`}</title>
+        <title>{`Signin - ${config.app.appUrl}`}</title>
         <meta
           name="description"
           content="Plan your next trip with budget hack"

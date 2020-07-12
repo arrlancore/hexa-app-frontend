@@ -13,6 +13,10 @@ import listClusterReducer, {
   clusterReducer,
 } from 'containers/HomePage/reducer';
 
+import destinationClusterReducer, {
+  destinationReducer,
+} from 'containers/DestinationPage/reducer';
+
 /**
  * Merges the main reducer with the router state and dynamically injected reducers
  */
@@ -24,6 +28,8 @@ export default function createReducer(injectedReducers = {}) {
     auth: authReducer,
     listCluster: listClusterReducer,
     cluster: clusterReducer,
+    destinationCluster: destinationClusterReducer,
+    destination: destinationReducer,
     ...injectedReducers,
   });
 

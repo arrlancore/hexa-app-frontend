@@ -15,3 +15,4 @@ export const ALL = '*';
 
 export const LOGIN_PAGE = '/';
 export const HOME_PAGE = '/home';
+export const DESTINATION_PAGE = '/destination/:id';

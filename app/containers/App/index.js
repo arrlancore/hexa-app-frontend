@@ -12,10 +12,17 @@ import { Switch, Route } from 'react-router-dom';
 
 import LoginPage from 'containers/LoginPage/Loadable';
 import HomePage from 'containers/HomePage/Loadable';
+import DestinationPage from 'containers/DestinationPage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 
 import GlobalStyle from '../../global-styles';
-import { LOGIN_PAGE, HOME_PAGE, ALL } from './constants';
+import {
+  LOGIN_PAGE,
+  HOME_PAGE,
+  DESTINATION_PAGE,
+  ALL,
+  ROLE_ADMIN,
+} from './constants';
 import AuthRoute from '../Authentication/AuthRoute';
 
 export default function App() {
@@ -28,6 +35,12 @@ export default function App() {
           exact
           path={HOME_PAGE}
           component={HomePage}
+        />
+        <AuthRoute
+          userAllowed={[ROLE_ADMIN]}
+          exact
+          path={DESTINATION_PAGE}
+          component={DestinationPage}
         />
         <Route component={NotFoundPage} />
       </Switch>

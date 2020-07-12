@@ -1,0 +1,349 @@
+/* eslint-disable */
+
+function createRow(row, space) {
+  let n = row;
+  let i = 0;
+  const constructor = [];
+  while (n) {
+    const j = i * space;
+    constructor.push(j);
+    i += 1;
+    n -= 1;
+  }
+  return constructor;
+}
+
+export function createMatrix(n, inc, options = { x: 1, y: 1 }) {
+  const row = createRow(n, inc);
+  const result = [];
+  row.forEach(v => {
+    const rows = [];
+    for (let i = 0; i < n; i += 1) {
+      const nodeX = i % 2 ? v + 1 : v;
+      const nodeY = i;
+      rows.push([nodeX * options.x, nodeY * options.y]);
+    }
+    result.push(rows);
+  });
+  return result;
+}
+
+export function Cluster(initNodes) {
+  const storage = initNodes || {};
+  const COUNTER_INDEX = 1;
+  const bordersCounter = [[0, 3], [1, 4], [2, 5], [3, 0], [4, 1], [5, 2]];
+  const borderDistances = [[2, 0], [1, 1], [-1, 1], [-2, 0], [-1, -1], [1, -1]];
+
+  this.add = (newNode, neighboard) => {
+    console.info('Create new node');
+    if (!Object.keys(storage).length) {
+      console.info('cluster is empty');
+      storage[newNode.name] = {
+        ...createNode(true, { x: 0, y: 0 }),
+      };
+      console.info('Create [root] node success', newNode.name);
+      return true;
+    }
+    // get target border
+    const newNodeBorder = newNode.border;
+    const targetNeightboardBorder =
+      bordersCounter[newNodeBorder][COUNTER_INDEX];
+    const neightboardWithBorder = {
+      name: neighboard,
+      border: targetNeightboardBorder,
+    };
+    const connsectSuccess = handleConnectNewNode(
+      newNode,
+      neightboardWithBorder,
+    );
+    if (connsectSuccess) {
+      handleCheckRelationByPosition(newNode.name);
+    }
+    return true;
+  };
+
+  this.get = name => {
+    if (!name) return storage;
+    return storage[name];
+  };
+
+  this.remove = id => {
+    let isAllowed = false;
+    const nodeTarget = this.get(id);
+    if (!nodeTarget) {
+      console.error('target not found');
+      return false;
+    }
+    const childTarget = Object.values(nodeTarget.borders);
+
+    if (childTarget.length === 1) {
+      isAllowed = true;
+    } else {
+      // remove child has neighbour
+      const nodeToCheck = handleRemoveChildNeighbour(childTarget);
+      const mappedNodes = mappingNode(nodeToCheck);
+
+      const otherPathConnections = [];
+      mappedNodes.forEach(([from, to]) => {
+        // find another path connection
+        const result = findPathBFS(from, to, id);
+        if (result) {
+          otherPathConnections.push(true);
+        }
+      });
+      isAllowed = mappedNodes.length === otherPathConnections.length;
+    }
+    if (isAllowed) {
+      handleRemoveFromNodes(nodeTarget, id);
+    } else {
+      console.error('node is not allowed to be remove');
+    }
+    return isAllowed;
+  };
+
+  // private method
+  const createNode = (isRoot = false, initialPosition = null) => ({
+    isRoot,
+    borders: {},
+    position: initialPosition,
+  });
+
+  const findPathBFS = (from, to, skippedNode) => {
+    const INCREMENT = 1; // increment cost
+    const initialNode = [null, from.name, 0]; // from, to, cost
+    // create queues
+    const queue = new Queue();
+    queue.enqueue(initialNode);
+    // create stack visited
+    const visited = new SimpleStack();
+
+    let result = null;
+
+    while (!queue.isEmpty() && !result) {
+      // get and delete from the queue
+      const x = queue.peek();
+      queue.dequeue();
+      // mark x as visited
+      visited.push(x);
+      // get successor
+      const excludesChildCheck = [...visited.getElements()].map(
+        item => item[1],
+      );
+      const skipped = [...excludesChildCheck, skippedNode];
+      const successorX = findChilds(x[1], skipped)
+        .map(item => [x[1], item.name, x[2] + INCREMENT])
+        .sort((a, b) => a[2] - b[2]);
+      // add successor to queue
+      successorX.forEach(queue.enqueue);
+      if (x[1] === to.name) {
+        result = visited.getElements();
+        queue.clearElements();
+      }
+    }
+    return result;
+  };
+
+  function Queue() {
+    let elements = [];
+
+    this.enqueue = e => elements.push(e);
+    this.dequeue = () => elements.shift();
+    this.peek = () => elements[0];
+    this.isEmpty = () => elements.length === 0;
+    this.getElements = () => elements;
+    this.clearElements = () => {
+      elements = [];
+    };
+  }
+
+  function SimpleStack() {
+    const elements = [];
+    const marker = [];
+    const INDEX_ELEMENT_NAME = 1;
+
+    this.push = element => {
+      if (!marker.includes(element[INDEX_ELEMENT_NAME])) {
+        marker.push(element[1]);
+        elements.push(element);
+      }
+    };
+    this.getElements = () => elements;
+  }
+
+  const findChilds = (nodeName, skipped = []) => {
+    const node = this.get(nodeName);
+    return node
+      ? Object.values(node.borders).filter(item => !skipped.includes(item.name))
+      : [];
+  };
+
+  const handleRemoveFromNodes = (node, key) => {
+    const nodeBorders = Object.entries(node.borders);
+    // delete from neighbour
+    nodeBorders.forEach(([bkey, property]) => {
+      const nodeNeighbour = this.get(property.name);
+      const borderTarget = bordersCounter[bkey][COUNTER_INDEX];
+      const newBorders = nodeNeighbour.borders;
+      delete newBorders[borderTarget];
+
+      // update borders
+      nodeNeighbour.borders = newBorders;
+      storage[property.name] = nodeNeighbour;
+    });
+    // delete on nodes
+    delete storage[key];
+  };
+
+  const handleRemoveChildNeighbour = list => {
+    const [startNode, ...rest] = list;
+    let checkedList = [];
+    rest.forEach(itemNode => {
+      if (
+        !isNeighboured(itemNode.name, startNode.name) &&
+        !isListNeighboured(checkedList, itemNode.name)
+      ) {
+        checkedList = [...checkedList, itemNode];
+      }
+    });
+    return [startNode, ...checkedList];
+  };
+
+  const isNeighboured = (firstNode, secondNode) => {
+    const node = this.get(firstNode);
+    const listNeighbour = Object.values(node.borders).map(each => each.name);
+    return listNeighbour.includes(secondNode);
+  };
+
+  const isListNeighboured = (list, nodeName) => {
+    const checkedList = list.map(item => isNeighboured(item.name, nodeName));
+    return !!checkedList.length;
+  };
+
+  const mappingNode = list => {
+    const tempList = [...list];
+    const mappedNode = [];
+    for (let i = 0; i < list.length; i += 1) {
+      const start = tempList.shift();
+      if (tempList[0]) {
+        tempList.forEach(item => {
+          mappedNode.push([start, item]);
+        });
+      }
+    }
+    return mappedNode;
+  };
+
+  const handleConnectNewNode = (newNode, targetNode) => {
+    const neighboardNode = storage[targetNode.name];
+    if (!neighboardNode) {
+      console.error('node target is not exist');
+      return false;
+    }
+    if (neighboardNode.borders[targetNode.border]) {
+      console.error('border has been used');
+      return false;
+    }
+    if (storage[newNode.name]) {
+      console.error('node has been exist');
+      return false;
+    }
+
+    // create new position
+    const [xTarget, yTarget] = borderDistances[targetNode.border];
+    const newPosition = {
+      x: xTarget + neighboardNode.position.x,
+      y: yTarget + neighboardNode.position.y,
+    };
+    // create new node
+    const newNodeToConnect = createNode(false, newPosition);
+    // set connected border
+    newNodeToConnect.borders[newNode.border] = targetNode;
+    // update to main nodes
+    storage[newNode.name] = newNodeToConnect;
+
+    // update connected border on the neighboard
+    neighboardNode.borders[targetNode.border] = newNode;
+    // task complete
+    console.info('Create new node success:', newNode.name);
+    return true;
+  };
+
+  const handleConnectExisting = (fromNode, toNode) => {
+    const fromBorders = storage[fromNode.name].borders;
+    if (fromBorders[fromNode.border]) {
+      console.log('border has been used', 123);
+      return false;
+    }
+    fromBorders[fromNode.border] = toNode;
+    storage[fromNode.name].borders = fromBorders;
+
+    const toBorders = storage[toNode.name].borders;
+    toBorders[toNode.border] = fromNode;
+    storage[toNode.name].borders = toBorders;
+    console.log('success connected to', fromNode.name);
+    return true;
+  };
+
+  const handleCheckRelationByPosition = newNodeName => {
+    const currentPosition = storage[newNodeName].position;
+    const { x, y } = currentPosition;
+    const allX = [];
+    const allY = [];
+    const foundNeighbourd = [];
+
+    const allNodeNeighbourd = borderDistances.map(([nodeX, nodeY]) => {
+      const xNeighbour = x + nodeX;
+      const yNeighbour = y + nodeY;
+      allX.push(xNeighbour);
+      allY.push(yNeighbour);
+      const neighbour = {
+        x: xNeighbour,
+        y: yNeighbour,
+      };
+      return JSON.stringify(neighbour);
+    });
+
+    const filter = {
+      x: {
+        min: Math.min(...allX),
+        max: Math.max(...allX),
+      },
+      y: {
+        min: Math.min(...allY),
+        max: Math.max(...allY),
+      },
+    };
+
+    // Find all neighboard nearest by range
+    const nodes = Object.entries(storage);
+    nodes.forEach(([key, item]) => {
+      // cretae filter by range
+      const filteredRange =
+        item.position.x >= filter.x.min &&
+        item.position.x <= filter.x.max &&
+        item.position.y >= filter.y.min &&
+        item.position.y <= filter.y.max;
+      const foundMatchPosition = allNodeNeighbourd.includes(
+        JSON.stringify(item.position),
+      );
+      if (filteredRange && foundMatchPosition) {
+        foundNeighbourd.push({
+          property: item,
+          index: allNodeNeighbourd.indexOf(JSON.stringify(item.position)),
+          key,
+        });
+      }
+    });
+
+    foundNeighbourd.forEach(target => {
+      const borderTarget = bordersCounter[target.index][COUNTER_INDEX];
+      if (!storage[target.key].borders[borderTarget]) {
+        const counterTarget = bordersCounter[borderTarget][COUNTER_INDEX];
+        handleConnectExisting(
+          { name: target.key, border: borderTarget },
+          { name: newNodeName, border: counterTarget },
+        );
+      }
+    });
+  };
+}

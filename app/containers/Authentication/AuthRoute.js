@@ -21,12 +21,14 @@ const AuthRoute = ({ component: Component, userAllowed = [], ...rest }) => {
   const isAuthenticatedUser = _token && _user;
 
   const isAuthorizedUser =
-    userAllowed[0] === ALL_USER ? true : userAllowed.includes(_user.role);
+    userAllowed[0] === ALL_USER
+      ? true
+      : userAllowed.includes(JSON.parse(_user)?.role);
 
   // update/persist auth state
   React.useEffect(() => {
     if (!isAuth && isAuthenticatedUser) {
-      dispatch(userSignInSuccess(JSON.parse(_user), _token));
+      dispatch(userSignInSuccess(_user, _token));
     }
   }, []);
 

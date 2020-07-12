@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /*
  * HomePage
  *
@@ -23,6 +24,7 @@ import CustomButton from 'components/CustomButton';
 import AddIcon from '@material-ui/icons/Add';
 
 import { useDispatch, useSelector } from 'react-redux';
+import { object } from 'prop-types';
 import PageLayout from '../../components/PageLayout';
 import Authorized from '../Authentication/Authorized';
 import { ROLE_ADMIN } from '../App/constants';
@@ -64,7 +66,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function HomePage() {
+export default function HomePage({ history }) {
   const classes = useStyles();
   // const form = useForm();
   const dispatch = useDispatch();
@@ -106,7 +108,7 @@ export default function HomePage() {
         handleClose={handleCloseDialog}
       />
       <Helmet>
-        <title>{`Home - ${config.app.appName}`}</title>
+        <title>{`Home - ${config.app.appUrl}`}</title>
         <meta
           name="description"
           content="Plan your next trip with budget hack"
@@ -123,7 +125,12 @@ export default function HomePage() {
                 alignItems: 'center',
               }}
             >
-              <Typography gutterBottom variant="h4" component="h1">
+              <Typography
+                style={{ fontWeight: 'bold' }}
+                gutterBottom
+                variant="h4"
+                component="h1"
+              >
                 All Places
               </Typography>
               <Authorized roles={[ROLE_ADMIN]}>
@@ -139,9 +146,16 @@ export default function HomePage() {
               </Authorized>
             </section>
             {listCluster.data?.map(item => (
-              // eslint-disable-next-line no-underscore-dangle
               <Card className={classes.card} key={item._id}>
-                <CardActionArea>
+                <CardActionArea
+                  onClick={() =>
+                    history.push(
+                      auth.data?.role === 'admin'
+                        ? `/destination/${item._id}`
+                        : `/trip-plan/${item._id}`,
+                    )
+                  }
+                >
                   <CardMedia
                     component="img"
                     alt="Contemplative Reptile"
@@ -182,3 +196,5 @@ export default function HomePage() {
     </PageLayout>
   );
 }
+
+HomePage.propTypes = { history: object };

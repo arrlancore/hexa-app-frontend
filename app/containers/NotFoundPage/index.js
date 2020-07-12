@@ -9,11 +9,16 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import messages from './messages';
+import PageLayout from '../../components/PageLayout';
 
 export default function NotFound() {
   return (
-    <h1>
-      <FormattedMessage {...messages.header} />
-    </h1>
+    <PageLayout>
+      <div style={{ minHeight: '75vh', padding: 64 }}>
+        <h1>
+          <FormattedMessage {...messages.header} />
+        </h1>
+      </div>
+    </PageLayout>
   );
 }
