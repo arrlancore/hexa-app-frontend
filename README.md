@@ -16,6 +16,8 @@
 - `npm start` (Development)
 - `npm run build && npm run start:prod` (Production)
 
+After run `npm run build` the production script will be generated on `/build` directory
+
 ## CI/CD
 
 Github & Netlify service
