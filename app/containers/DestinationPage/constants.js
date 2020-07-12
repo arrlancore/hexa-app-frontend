@@ -82,3 +82,16 @@ export const DESTINATION_TYPE = [
   'Historical',
   'Art & Culture',
 ];
+
+export const SKIP_DETAIL = [
+  'createdBy',
+  'updatedBy',
+  'createdAt',
+  'updatedAt',
+  '__v',
+  '_id',
+  '_id',
+  'isRoot',
+  'borders',
+  'position',
+];

@@ -22,7 +22,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-
+import AddIcon from '@material-ui/icons/Add';
 import { useDispatch, useSelector } from 'react-redux';
 import { object } from 'prop-types';
 import PageLayout from '../../components/PageLayout';
@@ -30,9 +30,10 @@ import PageLayout from '../../components/PageLayout';
 // import { ROLE_ADMIN } from '../App/constants';
 import { getDestinationCluster } from './actions';
 import FormDialog from './FormDialog';
+import { SKIP_DETAIL } from './constants';
 // import { DEFAULT_IMAGE } from './constants';
 // import Hexagon from './Hexagon';
-import { Cluster } from './utils';
+import { Cluster, toTitleCase } from './utils';
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -83,13 +84,16 @@ export default function DestinationPage({ match }) {
   const destination = useSelector(e => e.destination);
 
   const [cluster, setCluster] = React.useState(null);
+  const [onViewNode, setOnViewNode] = React.useState(null);
 
   const [openDialog, setOpenDialog] = React.useState(false);
   const [dataEdit, setDataEdit] = React.useState(undefined);
 
   // get list data
   React.useEffect(() => {
-    dispatch(getDestinationCluster(auth.token, clusterId));
+    if (!destinationCluster.data) {
+      dispatch(getDestinationCluster(auth.token, clusterId));
+    }
   }, []);
 
   React.useEffect(() => {
@@ -119,15 +123,13 @@ export default function DestinationPage({ match }) {
   const nodes = cluster?.get() || {};
   const listNodes = Object.values(nodes);
 
-  const handleAddNode = () => {
-    cluster.add(
-      {
-        name: '5f0a6d455db72b53fc0cfc8pp',
-        destinationName: 'Carefour',
-        border: 5,
-      },
-      '5f0a6d455db72b53fc0cfc86',
-    );
+  const handleViewNode = item => {
+    setOnViewNode(item);
+  };
+
+  const handleAddNewNode = () => {
+    setOnViewNode(null);
+    setOpenDialog(true);
   };
   // load grid 10 x 10
   // place rootNode on the center
@@ -183,13 +185,16 @@ export default function DestinationPage({ match }) {
                   <List className={classes.list}>
                     {listNodes.map(item => (
                       <ListItem
+                        selected={
+                          onViewNode?.destinationName === item.destinationName
+                        }
                         key={item._id}
                         button
-                        style={{ background: '#f7f7f7' }}
+                        onClick={() => handleViewNode(item)}
                       >
                         <ListItemAvatar>
                           <Avatar>
-                            <TripOriginIcon />
+                            <TripOriginIcon fontSize="small" />
                           </Avatar>
                         </ListItemAvatar>
                         <ListItemText
@@ -198,11 +203,48 @@ export default function DestinationPage({ match }) {
                         />
                       </ListItem>
                     ))}
+                    <ListItem button onClick={handleAddNewNode}>
+                      <ListItemAvatar>
+                        <Avatar>
+                          <AddIcon fontSize="small" />
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText primary="Add New destination" />
+                    </ListItem>
                   </List>
                 </Grid>
                 <Grid xs={6} item>
-                  Child
-                  <Button onClick={handleAddNode}>Add Node</Button>
+                  <List className={classes.list}>
+                    {Object.entries(onViewNode || {})
+                      .filter(([key]) => !SKIP_DETAIL.includes(key))
+                      .map(item => (
+                        <ListItem key={item._id}>
+                          <ListItemText
+                            primary={toTitleCase(item[0])}
+                            secondary={JSON.stringify(item[1], null, 8)}
+                          />
+                        </ListItem>
+                      ))}
+                    {onViewNode && (
+                      <ListItem>
+                        <ListItemText
+                          primary="Nearest Destination"
+                          secondary={Object.values(onViewNode.borders)
+                            .map(item => item.destinationName)
+                            .join(', ')}
+                        />
+                      </ListItem>
+                    )}
+                  </List>
+                  {onViewNode && (
+                    <Button
+                      style={{ float: 'right' }}
+                      color="secondary"
+                      onClick={handleAddNewNode}
+                    >
+                      remove
+                    </Button>
+                  )}
                 </Grid>
               </Grid>
             </div>

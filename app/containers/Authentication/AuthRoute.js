@@ -28,7 +28,7 @@ const AuthRoute = ({ component: Component, userAllowed = [], ...rest }) => {
   // update/persist auth state
   React.useEffect(() => {
     if (!isAuth && isAuthenticatedUser) {
-      dispatch(userSignInSuccess(_user, _token));
+      dispatch(userSignInSuccess(JSON.parse(_user), _token));
     }
   }, []);
 

@@ -1,5 +1,9 @@
 /* eslint-disable */
-
+export function toTitleCase(text) {
+  const result = text.replace(/([A-Z])/g, ' $1');
+  const newText = result.charAt(0).toUpperCase() + result.slice(1);
+  return newText;
+}
 function createRow(row, space) {
   let n = row;
   let i = 0;
