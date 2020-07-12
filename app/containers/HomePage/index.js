@@ -79,7 +79,9 @@ export default function HomePage({ history }) {
 
   // get list data
   React.useEffect(() => {
-    dispatch(getListCluster(auth.token));
+    if (!listCluster.data) {
+      dispatch(getListCluster(auth.token));
+    }
   }, []);
 
   const handleCloseDialog = loadList => {
