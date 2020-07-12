@@ -13,6 +13,7 @@ import { userSignOut } from '../containers/Authentication/actions';
 const useStyles = makeStyles(theme => ({
   toolbar: {
     borderBottom: `1px solid ${theme.palette.divider}`,
+    background: 'white',
   },
   toolbarTitle: {
     flex: 1,

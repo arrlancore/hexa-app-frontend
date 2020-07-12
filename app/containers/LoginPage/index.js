@@ -119,7 +119,7 @@ export default function LoginPage({ history }) {
                     component="h1"
                     gutterBottom
                   >
-                    {`A unique travel guide with real travel prices from travelers like you.`}
+                    {`A unique travel guide with real travel prices for your next trip.`}
                   </Typography>
                   <Typography
                     style={{ color: '#fff' }}

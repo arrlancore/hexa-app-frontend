@@ -11,14 +11,14 @@
  * export const YOUR_ACTION_CONSTANT = 'yourproject/YourContainer/YOUR_ACTION_CONSTANT';
  */
 
-export const SIGN_OUT = 'NemsDesktop/Authentication/SIGN_OUT';
-export const SIGN_IN_REQUEST = 'NemsDesktop/Authentication/SIGN_IN_REQUEST';
-export const SIGN_IN_SUCCESS = 'NemsDesktop/Authentication/SIGN_IN_SUCCESS';
-export const SIGN_IN_FAILURE = 'NemsDesktop/Authentication/SIGN_IN_FAILURE';
+export const SIGN_OUT = 'HexaApp/Authentication/SIGN_OUT';
+export const SIGN_IN_REQUEST = 'HexaApp/Authentication/SIGN_IN_REQUEST';
+export const SIGN_IN_SUCCESS = 'HexaApp/Authentication/SIGN_IN_SUCCESS';
+export const SIGN_IN_FAILURE = 'HexaApp/Authentication/SIGN_IN_FAILURE';
 
-export const SIGN_OUT_REQUEST = 'NemsDesktop/Authentication/SIGN_OUT_REQUEST';
-export const SIGN_OUT_SUCCESS = 'NemsDesktop/Authentication/SIGN_OUT_SUCCESS';
-export const SIGN_OUT_FAILURE = 'NemsDesktop/Authentication/SIGN_OUT_FAILURE';
+export const SIGN_OUT_REQUEST = 'HexaApp/Authentication/SIGN_OUT_REQUEST';
+export const SIGN_OUT_SUCCESS = 'HexaApp/Authentication/SIGN_OUT_SUCCESS';
+export const SIGN_OUT_FAILURE = 'HexaApp/Authentication/SIGN_OUT_FAILURE';
 
 export const TOKEN_KEY = '_app_user_token';
 export const USER_KEY = '_app_user_data';

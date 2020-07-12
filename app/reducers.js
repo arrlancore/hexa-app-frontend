@@ -9,6 +9,9 @@ import history from 'utils/history';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import snackbarMessageProvider from 'containers/SnackbarProvider/reducer';
 import authReducer from 'containers/Authentication/reducer';
+import listClusterReducer, {
+  clusterReducer,
+} from 'containers/HomePage/reducer';
 
 /**
  * Merges the main reducer with the router state and dynamically injected reducers
@@ -19,6 +22,8 @@ export default function createReducer(injectedReducers = {}) {
     router: connectRouter(history),
     snackbarMessage: snackbarMessageProvider,
     auth: authReducer,
+    listCluster: listClusterReducer,
+    cluster: clusterReducer,
     ...injectedReducers,
   });
 

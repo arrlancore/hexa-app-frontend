@@ -14,6 +14,7 @@ export default function Button({
   loading,
   size = 'large',
   children,
+  startIcon = null,
   ...props
 }) {
   const classes = useStyles(props);
@@ -26,7 +27,9 @@ export default function Button({
       startIcon={
         loading ? (
           <CircularProgress size={24} style={{ marginRight: 14 }} />
-        ) : null
+        ) : (
+          startIcon
+        )
       }
     >
       {children}
@@ -38,5 +41,6 @@ Button.propTypes = {
   loading: bool,
   size: string,
   children: node,
+  startIcon: node,
   color: string,
 };
