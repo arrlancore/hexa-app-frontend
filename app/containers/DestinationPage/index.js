@@ -91,9 +91,7 @@ export default function DestinationPage({ match }) {
 
   // get list data
   React.useEffect(() => {
-    if (!destinationCluster.data) {
-      dispatch(getDestinationCluster(auth.token, clusterId));
-    }
+    dispatch(getDestinationCluster(auth.token, clusterId));
   }, []);
 
   React.useEffect(() => {
